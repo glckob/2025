@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <title>វិទ្យាល័យកូប</title>
+  <style>
+    body {
+      font-family: "Khmer OS Muol Light", Arial, sans-serif;
+      margin: 0;
+      background: #f0f0f0;
+      text-align: center;
+    }
+
+    .header {
+      padding: 20px 10px 10px;
+      background-color: white;
+    }
+
+    .header img {
+      width: 90px;
+      height: auto;
+      margin-bottom: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .title1 {
+      color: #007bff;
+      font-size: 28px;
+      font-weight: bold;
+      margin: 10px 0 5px;
+    }
+
+    .title2 {
+      color: #006400;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .login-container {
+      background: white;
+      padding: 30px 40px;
+      max-width: 400px;
+      margin: 20px auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px 0;
+      width: 90%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #message {
+      color: red;
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 30px;
+    }
+
+    .title4 {
+      font-size: 14px;
+      padding: 10px;
+      background-color: #ffffff;
+      color: #555;
+    }
+
+    /* ✅ Overlay loading */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    #loadingOverlay img {
+      width: 300px;
+      margin-top: 20%;
+    }
+
+    @media (max-width: 500px) {
+      .login-container {
+        width: 90%;
+        padding: 20px;
+      }
+
+      .title1 {
+        font-size: 22px;
+      }
+
+      .title2 {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Loading Overlay -->
+  <div id="loadingOverlay">
+    <img src="33Ho.gif" alt="កំពុងទាញទិន្នន័យ...">
+  </div>
+
+  <div class="header">
+    <img src="moeys.png" alt="logo">
+    <div class="title1">វិទ្យាល័យកូប</div>
+    <div class="title2">ច្រកចូលប្រព័ន្ធគ្រប់គ្រងទិន្នន័យចំរុះ</div>
+        <div class="title3">Integrated Data Management System Gateways(IDMSG)</div>
+
+  </div>
+
+  <div class="login-container">
+    <div class="title3">សូមបញ្ចូលព័ត៌មានគណនេយ្យរបស់អ្នក</div>
+    <input type="text" id="username" placeholder="ឈ្មោះគណនេយ្យ" autocomplete="off" />
+    <br />
+    <input type="password" id="password" placeholder="ពាក្យសំងាត់" autocomplete="off" />
+    <br />
+    <button onclick="login()" id="loginBtn">ចូលប្រព័ន្ធ!</button>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+
+    usernameInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        passwordInput.focus();
+      }
+    });
+
+    passwordInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loginBtn.click();
+      }
+    });
+
+    async function login() {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      const messageEl = document.getElementById("message");
+      messageEl.textContent = "";
+
+      if (!username || !password) {
+        messageEl.textContent = "សូមបញ្ចូលឈ្មោះនិងពាក្យសំងាត់ជាមុនសិន!";
+        return;
+      }
+
+      // ✅ បង្ហាញ Overlay Loading
+      loadingOverlay.style.display = "block";
+
+      const apiUrl = "https://script.google.com/macros/s/AKfycbyUYvmW04FSmFG9_vqzGemfXHsYM5qjjh9L55hUi5QaCPuE1xq2vN1XJZqCKj3B-6Zj/exec";
+
+      try {
+        const response = await fetch(`${apiUrl}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+        if (!response.ok) throw new Error("គ្មានបណ្តាញអ៊ីនធឺណេត");
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.location.href = data.access_url;
+        } else {
+          loadingOverlay.style.display = "none";
+          messageEl.textContent = data.message || "ពាក្យសំងាត់មិនត្រឹមត្រូវ.";
+        }
+      } catch (error) {
+        loadingOverlay.style.display = "none";
+        messageEl.textContent = "ការភ្ជាប់ទៅ API បរាជ័យ.";
+        console.error(error);
+      }
+    }
+  // ✅ Focus username input when page loads
+  window.onload = function () {
+    document.getElementById("username").focus();
+  };
+  </script>
+
+  <div class="header">
+    <div class="title4">បង្កើតដោយ លោកគ្រូ វង្ស សាណូវុទ្ធ ទំនាក់ទំនង ០៩៧ ២៤ ៤៤៤ ២៤ Telegram: <a href="https://t.me/lazytospeak">https://t.me/lazytospeak</a></div>
+  </div>
+
+</body>
+</html>
