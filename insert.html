@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Insert Data to Google Sheet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      background: #f7f7f7;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input[type=text],
+    input[type=password],
+    input[type=url] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 18px;
+      padding: 10px 15px;
+      font-size: 16px;
+      width: 100%;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Insert Data to Google Sheet</h2>
+
+  <form id="insertForm">
+    <label for="id">ID:</label>
+    <input type="text" id="id" name="id" required />
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required />
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required />
+
+    <label for="access_url">Access URL:</label>
+    <input type="url" id="access_url" name="access_url" required />
+
+    <button type="submit">Insert</button>
+  </form>
+
+  <div id="message"></div>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz-qjTZq1s9bKXJq24Be9KBV-8eoZ-mV4Z9XIAuOPqiHGU1xjyQtuDZLipHZVlLFFvA3A/exec';
+
+    const form = document.getElementById('insertForm');
+    const messageDiv = document.getElementById('message');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      messageDiv.textContent = 'Sending...';
+
+      const data = {
+        id: form.id.value.trim(),
+        username: form.username.value.trim(),
+        password: form.password.value.trim(),
+        access_url: form.access_url.value.trim()
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.result === 'success') {
+          messageDiv.style.color = 'green';
+          messageDiv.textContent = '✅ ' + result.message;
+          form.reset();
+        } else {
+          messageDiv.style.color = 'red';
+          messageDiv.textContent = '❌ ' + result.message;
+        }
+        submitBtn.disabled = false;
+      })
+      .catch(error => {
+        messageDiv.style.color = 'red';
+        messageDiv.textContent = '❌ Error: ' + error.message;
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
+
+</body>
+</html>
