@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>វិទ្យាល័យកូប បញ្ចូលទិន្នន័យ</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    @font-face {
+      font-family: 'Khmer OS Muol Light';
+      src: local('Khmer OS Muol Light');
+    }
+    @font-face {
+      font-family: 'Khmer OS Battambang';
+      src: local('Khmer OS Battambang');
+    }
+
+    body {
+      font-family: 'Khmer OS Battambang', sans-serif;
+      background: linear-gradient(to bottom right, #e3f2fd, #ffffff);
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    img#logo {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-height: 70px;
+    }
+    .title1 {
+      font-family: 'Khmer OS Muol Light', serif;
+      font-size: 26px;
+      color: #004085;
+      text-align: center;
+      margin: 0;
+    }
+    .title2 {
+      font-size: 16px;
+      color: #0069d9;
+      text-align: center;
+      margin: 4px 0 20px 0;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input[type='text'],
+    input[type='password'],
+    input[type='url'] {
+      width: 100%;
+      padding: 6px 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'Khmer OS Battambang', sans-serif;
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .password-wrapper i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #007bff;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      font-size: 14px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Khmer OS Battambang', sans-serif;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(255, 255, 255, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #overlay img {
+      width: 48px;
+      height: 48px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="moeys.png" alt="MOEYS Logo" id="logo" />
+    <div class="title1">វិទ្យាល័យកូប</div>
+    <div class="title2">បញ្ចូលគណនេយ្យ និងតំណ</div>
+
+    <form id="insertForm" novalidate>
+      <label for="id">លេខសម្គាល់ (ID):</label>
+      <input type="text" name="id" id="id" readonly tabindex="-1" />
+
+      <label for="username">ឈ្មោះអ្នកប្រើប្រាស់:</label>
+      <input type="text" name="username" id="username" placeholder="ឈ្មោះអ្នកប្រើប្រាស់" required tabindex="1" />
+
+      <label for="password">លេខសម្ងាត់:</label>
+      <div class="password-wrapper">
+        <input type="password" name="password" id="password" placeholder="លេខសម្ងាត់" required tabindex="2" />
+        <i id="togglePassword" class="fa-solid fa-eye" tabindex="-1"></i>
+      </div>
+
+      <label for="access_url">តំណភ្ជាប់ (Access URL):</label>
+      <input type="url" name="access_url" id="access_url" placeholder="https://example.com" required tabindex="3" />
+
+      <button type="submit" tabindex="4">បញ្ជូនទិន្នន័យ</button>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <div id="overlay">
+    <img src="33Ho.gif" alt="Loading..." />
+  </div>
+
+  <script>
+    const form = document.getElementById('insertForm');
+    const message = document.getElementById('message');
+    const overlay = document.getElementById('overlay');
+    const idField = document.getElementById('id');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const usernameInput = document.getElementById('username');
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz-qjTZq1s9bKXJq24Be9KBV-8eoZ-mV4Z9XIAuOPqiHGU1xjyQtuDZLipHZVlLFFvA3A/exec';
+
+    function generateUID() {
+      const now = new Date();
+      const pad = (n) => n.toString().padStart(2, '0');
+      return `UID-${pad(now.getDate())}${pad(now.getMonth() + 1)}${now.getFullYear().toString().slice(-2)}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      idField.value = generateUID();
+      usernameInput.focus();
+    });
+
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePassword.classList.toggle('fa-eye');
+      togglePassword.classList.toggle('fa-eye-slash');
+    });
+
+    form.addEventListener('submit', function (e) {
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        form.querySelectorAll('input:invalid').forEach(field => {
+          field.setCustomValidity('សូមបំពេញចំណុចនេះ!');
+          field.reportValidity();
+        });
+        return;
+      }
+
+      e.preventDefault();
+      idField.value = generateUID();
+      const formData = new FormData(form);
+      message.textContent = '';
+      overlay.style.display = 'flex';
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: formData,
+      })
+        .then(res => res.text())
+        .then(res => {
+          overlay.style.display = 'none';
+          message.style.color = 'green';
+          message.textContent = '✅ បានបញ្ចូលទិន្នន័យជោគជ័យ!';
+          form.reset();
+          idField.value = generateUID();
+          usernameInput.focus();
+        })
+        .catch(err => {
+          overlay.style.display = 'none';
+          message.style.color = 'red';
+          message.textContent = '❌ បរាជ័យក្នុងការផ្ញើទិន្នន័យ: ' + err;
+        });
+    });
+
+    form.querySelectorAll('input').forEach(field => {
+      field.addEventListener('input', () => field.setCustomValidity(''));
+    });
+  </script>
+</body>
+</html>
